@@ -1,0 +1,26 @@
+# plugins/config_backup/tool.yaml
+# ──────────────────────────────────────────────────────────────
+name: config_backup_all
+
+description: >
+  Take a running configuration backup of ALL network devices.
+  Use this tool when the user asks to back up configurations,
+  take config backup of all devices, save device configs,
+  or perform a bulk configuration backup. This tool handles
+  all devices automatically — no device name is needed.
+  Backups are saved to the server with a date-time stamped folder.
+
+parameters:
+  properties:
+    backup_type:
+      type: string
+      description: >
+        The type of configuration to back up. Options:
+        'running'  — show running-config (default)
+        'startup'  — show startup-config
+        'both'     — back up both running and startup configs
+      enum:
+        - running
+        - startup
+        - both
+  required: []

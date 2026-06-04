@@ -1,0 +1,16 @@
+# plugins/vlan_check/tool.yaml
+# ──────────────────────────────────────────────────────────────
+name: get_vlan_details
+
+description: >
+  Check the vlan details of the switch.
+  Use when the user asks about vlan details. Get vlan details of specific switch/device
+  or errors on a  switch.
+
+parameters:
+  properties:
+    device:
+      type: string
+      description: "The device hostname, e.g. 'switch1' or 'switch2'"
+  required:
+    - device

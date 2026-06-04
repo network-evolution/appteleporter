@@ -1,0 +1,20 @@
+# plugins/interface_check/tool.yaml
+# ──────────────────────────────────────────────────────────────
+name: get_interface_status
+
+description: >
+  Check the status of a network interface on a device.
+  Use when the user asks about interface status, link state,
+  or errors on a router or switch.
+
+parameters:
+  properties:
+    device:
+      type: string
+      description: "The device hostname, e.g. 'router1' or 'switch1'"
+    interface:
+      type: string
+      description: "The interface name, e.g. 'gi0/0' or 'eth0'"
+  required:
+    - device
+    - interface

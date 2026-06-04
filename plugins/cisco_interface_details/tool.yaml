@@ -1,0 +1,105 @@
+# plugins/cisco_interface_detail/tool.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+#  Cisco Interface Detail — tool.yaml
+#  ────────────────────────────────────────────────────────────────────────────
+#  Tells the LLM:
+#    • when to invoke this tool
+#    • what parameters to collect from the user
+#    • how to present the returned data in a useful, human-readable way
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: cisco_interface_detail
+
+description: >
+  Connect to a Cisco IOS router or switch via SSH (using vault credentials)
+  and retrieve comprehensive interface diagnostics.
+
+  WHEN TO USE THIS TOOL
+  ─────────────────────
+  Invoke whenever the user asks about interface health, status, errors, traffic,
+  counters, or bandwidth on a Cisco device.  Examples:
+    • "Check all interfaces on router1"
+    • "Show me Gi0/0 details on core-rtr"
+    • "Are there any CRC errors on dist-sw-02?"
+    • "What is the state of interface Fa0/1 on access-sw-floor3?"
+    • "Give me a full interface report for edge-router"
+
+  PARAMETERS TO COLLECT
+  ─────────────────────
+  device_name  — the credential name stored in Settings → Credentials.
+  interface    — "all" (scan every interface) or a specific interface name
+                 such as "GigabitEthernet0/0", "Gi0/1", "FastEthernet0/0",
+                 "Loopback0", "Vlan10", etc.  When the user does not specify
+                 an interface, default to "all".
+
+  HOW TO PRESENT THE RESULTS
+  ──────────────────────────
+  The tool returns structured text sections, one per interface.  When you
+  summarise the output, always cover these points:
+
+  1. OVERALL HEALTH SUMMARY
+     - Total interfaces found vs. interfaces that are Up / Down / Admin-Down.
+     - Any interfaces with line-protocol mismatch (physical up, protocol down).
+
+  2. ERROR HIGHLIGHTS  ← most important for the engineer
+     - Flag any interface where input errors, CRC errors, frame errors,
+       output errors, or collisions are > 0.
+     - State the exact counter values (e.g. "Gi0/1 has 47 CRC errors").
+     - Highlight interfaces with input/output drops or ignored packets.
+
+  3. TRAFFIC OVERVIEW
+     - Report input rate and output rate (bps / pps) for each interface.
+     - Call out interfaces with unusually high utilisation or zero traffic
+       on an interface that should be active.
+
+  4. INTERFACE CONFIGURATION CLUES
+     - Duplex and speed mismatches (half-duplex on a Gigabit port is a red flag).
+     - Encapsulation type if non-default.
+     - MTU if non-standard.
+     - Last input / last output timestamps — flag interfaces that have had
+       no recent traffic (e.g. "no traffic for 3 days").
+
+  5. PER-INTERFACE DETAIL (when a single interface was requested)
+     - Reproduce all counters verbatim so the engineer has the full picture.
+
+  6. ACTIONABLE RECOMMENDATIONS
+     - Suggest root-cause actions for every anomaly found
+       (e.g. "CRC errors on Gi0/1 suggest a duplex mismatch or bad cable;
+        check the connected device's duplex/speed settings").
+
+  Always be specific — use the real interface names and real counter values
+  from the tool output.  Never say "some interfaces have errors"; say which
+  ones and how many.
+
+parameters:
+  properties:
+    device_name:
+      type: string
+      description: >
+        The credential name exactly as saved in Settings → Credentials,
+        e.g. "core-rtr-01" or "edge-router".  Used to look up the host IP,
+        SSH username, password, and port from the vault.
+
+    interface:
+      type: string
+      description: >
+        Which interface(s) to inspect.
+
+        • Use "all" (or omit entirely) to check every interface on the device.
+          The tool will first discover all interfaces via "show ip int brief",
+          then run "show interface <name>" for each one.
+
+        • Supply a specific interface name to check only that interface.
+          Both full names and Cisco short-forms are accepted:
+            "GigabitEthernet0/0", "Gi0/0", "FastEthernet0/1", "Fa0/1",
+            "Loopback0", "Lo0", "Vlan10", "Se0/0/0", etc.
+
+        If the name given does not exist on the device, the tool returns the
+        list of available interface names so you can ask the user to clarify.
+
+      default: "all"
+
+  required:
+    - device_name

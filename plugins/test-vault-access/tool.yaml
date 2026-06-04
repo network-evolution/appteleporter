@@ -1,0 +1,19 @@
+# plugins/test-vault-access/tool.yaml
+# ──────────────────────────────────────────────────────────────
+name: test_vault_access
+
+description: >
+  Test whether a named device credential exists in the AppTelePorter vault
+  and display its details (host, username, port). The password is never
+  returned. Use this tool to verify vault setup before building real plugins
+  that depend on stored credentials.
+
+parameters:
+  properties:
+    device_name:
+      type: string
+      description: >
+        The credential name as saved in Settings → Credentials,
+        e.g. 'test-device' or 'core-router-01'.
+  required:
+    - device_name

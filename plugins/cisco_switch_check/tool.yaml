@@ -1,0 +1,41 @@
+# plugins/cisco_switch_check/tool.yaml
+# ──────────────────────────────────────────────────────────────
+name: cisco_switch_check
+
+description: >
+  Connect to a Cisco switch using stored vault credentials and retrieve
+  device information. Supports multiple check types: vlans, interfaces,
+  version, running config summary, arp table, mac address table, and
+  general health. Uses Netmiko over SSH. The device must have a valid
+  credential entry in Settings → Credentials before use.
+
+parameters:
+  properties:
+    device_name:
+      type: string
+      description: >
+        The credential name as saved in Settings → Credentials,
+        e.g. 'core-sw-01' or 'access-switch-floor2'. This is used
+        to look up host, username, password, and port from the vault.
+    check_type:
+      type: string
+      description: >
+        The type of check to perform on the switch. Options:
+        'vlans'      — show vlan brief
+        'interfaces' — show ip interface brief
+        'version'    — show version summary
+        'arp'        — show arp table
+        'mac'        — show mac address-table
+        'inventory'  — show inventory
+        'health'     — combined overview (version + interfaces + vlans)
+      enum:
+        - vlans
+        - interfaces
+        - version
+        - arp
+        - mac
+        - inventory
+        - health
+  required:
+    - device_name
+    - check_type
