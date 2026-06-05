@@ -14,6 +14,62 @@
 
 ---
 
+## Table of Contents
+
+- [What is AppTelePorter?](#what-is-appteleporter)
+- [What is Tool Studio?](#what-is-tool-studio)
+- [How to Install AppTelePorter](#how-to-install-appteleporter)
+  - [Step 1 — Pull the image](#step-1--pull-the-image)
+  - [Step 2 — Create a local data directory](#step-2--create-a-local-data-directory)
+  - [Step 3 — Start the container](#step-3--start-the-container)
+    - [Linux](#linux)
+    - [macOS (Docker Desktop)](#macos-docker-desktop)
+    - [Windows (Docker Desktop)](#windows-docker-desktop)
+  - [Step 4 — Open the UI and complete first-time setup](#step-4--open-the-ui-and-complete-first-time-setup)
+    - [4a — Set the vault master password](#4a--set-the-vault-master-password)
+    - [4b — Create the first admin user](#4b--create-the-first-admin-user)
+    - [4c — Configure your LLM provider (Lite edition only)](#4c--configure-your-llm-provider-lite-edition-only)
+- [This Repository](#this-repository)
+- [Available Plugins](#available-plugins)
+  - [Network — Cisco](#network--cisco)
+  - [Simulated / Demo Tools](#simulated--demo-tools)
+  - [Utilities](#utilities)
+- [Available MCP Servers](#available-mcp-servers)
+  - [Example & Demo Servers](#example--demo-servers)
+- [How to Use These Tools in AppTelePorter](#how-to-use-these-tools-in-appteleporter)
+  - [Option A — Copy into a running container](#option-a--copy-into-a-running-container)
+  - [Option B — Place in your volume mount before starting](#option-b--place-in-your-volume-mount-before-starting)
+  - [Option C — Use Tool Studio](#option-c--use-tool-studio-recommended-for-development)
+  - [Installing Python dependencies](#installing-python-dependencies)
+  - [Verify the tool loaded](#verify-the-tool-loaded)
+- [How to Create Your Own Plugin](#how-to-create-your-own-plugin)
+  - [Step 1 — Create the directory structure](#step-1--create-the-directory-structure)
+  - [Step 2 — Write tool.yaml](#step-2--write-toolyaml)
+  - [Step 3 — Write handler.py](#step-3--write-handlerpy)
+  - [Using vault credentials](#using-vault-credentials)
+  - [Start from the template](#start-from-the-template)
+- [How to Create Your Own MCP Server](#how-to-create-your-own-mcp-server)
+  - [Quickstart with FastMCP](#quickstart-with-fastmcp)
+  - [Directory structure](#directory-structure)
+  - [Register with AppTelePorter](#register-with-appteleporter)
+  - [Accessing vault credentials from MCP servers](#accessing-vault-credentials-from-mcp-servers)
+  - [Tool naming](#tool-naming)
+  - [Start from the template](#start-from-the-template-1)
+- [Why Build With AppTelePorter?](#why-build-with-appteleporter)
+  - [No development environment setup needed](#no-development-environment-setup-needed)
+  - [Install packages in seconds](#install-packages-in-seconds)
+  - [Test against live infrastructure from the browser](#test-against-live-infrastructure-from-the-browser)
+  - [The model handles parameter collection](#the-model-handles-parameter-collection)
+  - [Credentials stay in the vault](#credentials-stay-in-the-vault)
+  - [Easy to implement and run](#easy-to-implement-and-run)
+- [Plugin vs. MCP Server — Quick Reference](#plugin-vs-mcp-server--quick-reference)
+- [Contributing](#contributing)
+- [What's Coming](#whats-coming)
+- [Resources](#resources)
+- [License](#license)
+
+---
+
 ## What is AppTelePorter?
 
 AppTelePorter is a **container-native AI platform** that gives network and DevOps teams a conversational AI agent capable of executing real infrastructure operations — with every credential encrypted in a vault that never leaves your server.
