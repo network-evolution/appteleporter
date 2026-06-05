@@ -93,6 +93,8 @@ docker pull networkevolution/appteleporter_lite:latest
 
 Before starting the container, create a directory on your host machine. This is where AppTelePorter stores all its persistent data — plugins, MCP servers, the encrypted vault, chat history, and configuration.
 
+> **No terminal required on Windows, macOS, or Linux desktop:** You can create this folder anywhere on your machine using your system's file manager — just create a new folder and name it `appteleporter-data`. The terminal commands below are an alternative if you prefer them.
+
 ```bash
 # Linux / macOS
 mkdir -p ~/appteleporter-data
