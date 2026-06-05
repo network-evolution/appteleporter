@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "netbox": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "/app/backend/appteleporter-data/mcp_servers/netbox-mcp-server",
+                "run",
+                "netbox-mcp-server"
+            ],
+            "env": {
+                "NETBOX_URL": "***",
+                "NETBOX_TOKEN": "*****"
+            }
+        },
+    "example-dns-ping": {
+        "command": "python3",
+        "args": [
+          "server.py"
+        ],
+        "cwd": "/app/backend/appteleporter-data/mcp_servers/example-dns-ping",
+        "env": {}
+      },
+      "example-ip-time": {
+          "command": "python3",
+          "args": [
+            "server.py"
+          ],
+          "cwd": "/app/backend/appteleporter-data/mcp_servers/example-ip-time",
+          "env": {}
+        }
+  }
+}
