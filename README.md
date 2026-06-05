@@ -18,7 +18,7 @@
 
 AppTelePorter is a **container-native AI platform** that gives network and DevOps teams a conversational AI agent capable of executing real infrastructure operations — with every credential encrypted in a vault that never leaves your server.
 
-Think of it as **your own Chat App that can actually SSH into your switches, query your APIs, and run your automation scripts** — with credentials never exposed to any LLM, local or cloud.
+Think of it as **your own ChatAI App that can actually SSH into your switches, query your APIs, and run your automation scripts** — with credentials never exposed to any LLM, local or cloud.
 
 It ships in two editions:
 
