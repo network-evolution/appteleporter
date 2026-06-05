@@ -151,7 +151,25 @@ docker run -d --name appteleporter \
 
 #### macOS (Docker Desktop)
 
-**Option A — Terminal:**
+**Option A — Docker Desktop UI:**
+
+1. Open the **Docker Desktop** application on your Mac.
+2. Click the **Search** bar at the top and type:
+   ```
+   networkevolution/appteleporter_lite
+   ```
+3. Select the image from the results and click **Pull** to download it.
+4. Once the pull completes, find the image under **Images** in the left sidebar and click **Run**.
+5. Expand **Optional settings** and fill in the following:
+   - **Container name:** `appteleporter`
+   - **Ports — Host port `3000` → Container port `3000`** *(required — this is the web UI)*
+   - **Ports — Host port `1514` → Container port `1514`** *(optional — TCP and UDP, only if using Device Beacon syslog receiver)*
+   - **Volumes — Host path:** select the directory you created in Step 2 (e.g. `/Users/yourname/appteleporter-data`)
+   - **Volumes — Container path:** `/app/backend/appteleporter-data`
+     > ⚠️ **Do not change the container path.** This is the internal path AppTelePorter expects and must be entered exactly as shown.
+6. Click **Run**. The container will start and appear under **Containers**.
+
+**Option B — Terminal:**
 
 ```bash
 docker run -d --name appteleporter \
@@ -171,9 +189,13 @@ docker run -d --name appteleporter \
   networkevolution/appteleporter_lite:latest
 ```
 
-**Option B — Docker Desktop UI:**
+---
 
-1. Open the **Docker Desktop** application on your Mac.
+#### Windows (Docker Desktop)
+
+**Option A — Docker Desktop UI:**
+
+1. Open the **Docker Desktop** application on Windows.
 2. Click the **Search** bar at the top and type:
    ```
    networkevolution/appteleporter_lite
@@ -184,16 +206,12 @@ docker run -d --name appteleporter \
    - **Container name:** `appteleporter`
    - **Ports — Host port `3000` → Container port `3000`** *(required — this is the web UI)*
    - **Ports — Host port `1514` → Container port `1514`** *(optional — TCP and UDP, only if using Device Beacon syslog receiver)*
-   - **Volumes — Host path:** select the directory you created in Step 2 (e.g. `/Users/yourname/appteleporter-data`)
+   - **Volumes — Host path:** select the directory you created in Step 2 (e.g. `C:\Users\yourname\appteleporter-data`)
    - **Volumes — Container path:** `/app/backend/appteleporter-data`
      > ⚠️ **Do not change the container path.** This is the internal path AppTelePorter expects and must be entered exactly as shown.
 6. Click **Run**. The container will start and appear under **Containers**.
 
----
-
-#### Windows (Docker Desktop)
-
-**Option A — Command line:**
+**Option B — Command line:**
 
 *Command Prompt:*
 ```cmd
@@ -220,24 +238,6 @@ docker run -d --name appteleporter `
   -p 1514:1514/udp `
   networkevolution/appteleporter_lite:latest
 ```
-
-**Option B — Docker Desktop UI:**
-
-1. Open the **Docker Desktop** application on Windows.
-2. Click the **Search** bar at the top and type:
-   ```
-   networkevolution/appteleporter_lite
-   ```
-3. Select the image from the results and click **Pull** to download it.
-4. Once the pull completes, find the image under **Images** in the left sidebar and click **Run**.
-5. Expand **Optional settings** and fill in the following:
-   - **Container name:** `appteleporter`
-   - **Ports — Host port `3000` → Container port `3000`** *(required — this is the web UI)*
-   - **Ports — Host port `1514` → Container port `1514`** *(optional — TCP and UDP, only if using Device Beacon syslog receiver)*
-   - **Volumes — Host path:** select the directory you created in Step 2 (e.g. `C:\Users\yourname\appteleporter-data`)
-   - **Volumes — Container path:** `/app/backend/appteleporter-data`
-     > ⚠️ **Do not change the container path.** This is the internal path AppTelePorter expects and must be entered exactly as shown.
-6. Click **Run**. The container will start and appear under **Containers**.
 
 > Docker Desktop must be running before using either option. WSL 2 backend is recommended for best performance on Windows.
 
