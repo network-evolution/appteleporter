@@ -26,6 +26,7 @@ CLAUDE.md
 .installed.cfg
 *.egg
 MANIFEST
+docs/
 
 # PyInstaller
 #   Usually these files are written by a python script from a template
