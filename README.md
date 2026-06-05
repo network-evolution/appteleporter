@@ -18,12 +18,13 @@
 
 AppTelePorter is a **container-native AI platform** that gives network and DevOps teams a conversational AI agent capable of executing real infrastructure operations — with every credential encrypted in a vault that never leaves your server.
 
-Think of it as **your own ChatGPT that can actually SSH into your switches, query your APIs, and run your automation scripts** — with credentials never exposed to any LLM, local or cloud.
+Think of it as **your own Chat App that can actually SSH into your switches, query your APIs, and run your automation scripts** — with credentials never exposed to any LLM, local or cloud.
 
 It ships in two editions:
 
-- **Full edition** — includes a bundled local model. Inference stays entirely inside your infrastructure. No prompt, no tool output, no data ever leaves your network. Runs fully offline. For best performance, a GPU-enabled host is recommended, as the Full edition packages the AI model directly inside the container.
-- **Light edition** — bring your own LLM (OpenAI, Claude, or Gemini). The platform and **all credentials remain on your server**; conversation context — including tool results like device configs — is sent to your chosen cloud LLM provider for inference only. Choose this when you want frontier-model quality without hosting your own GPU.
+- **Lite edition** — bring your own LLM (OpenAI, Claude, or Gemini). The platform and **all credentials remain on your server**; conversation context — including tool results like device outputs — is sent to your chosen cloud LLM provider for inference only. Your credentials never leave the container. Choose this when you want frontier-model quality without hosting your own GPU. → [Docker Hub](https://hub.docker.com/r/networkevolution/appteleporter_lite/tags)
+- **Max edition** — includes a bundled local AI model. Inference stays entirely inside your infrastructure. No prompt, no tool output, no data of any kind ever leaves your network. Runs fully offline. A GPU-enabled host is recommended for best performance, as the Max edition packages the AI model directly inside the container. → [Docker Hub](https://hub.docker.com/r/networkevolution/appteleporter_max/tags)
+
 
 > **Important:** In both editions, your device credentials, passwords, and API keys are stored in an encrypted vault and are **never serialised into prompts or sent to any LLM**. Credentials are resolved locally at execution time — the handler function receives the actual value; the LLM (local or cloud) never sees it. Only the tool's *output* (e.g., a VLAN list) becomes part of the conversation.
 
@@ -32,19 +33,19 @@ It ships in two editions:
 1. You ask a question in plain English: *"What VLANs are configured on switch1?"*
 2. AppTelePorter figures out which tool to run and presents an **approval card**.
 3. You approve — credentials are resolved from the vault at execution time (never serialised into prompts), the tool executes, and the answer streams back.
-4. **Full edition:** No data left your network. **Light edition:** Tool execution stayed local; only the conversation context passed through your chosen LLM provider for synthesis.
+4. **Max edition:** No data left your network. **Lite edition:** Tool execution stayed local; only the conversation context passed through your chosen LLM provider for synthesis — your credentials stayed in the vault the entire time.
 
 **Key capabilities:**
 
 | Feature | Description |
 |---|---|
-| **Private AI Chat** | Conversational interface backed by a local bundled model (Full edition) or your choice of OpenAI, Claude, or Gemini (Light edition) |
-| **Credentials Never Exposed** | Argon2id + Fernet encrypted vault; credentials are injected at execution time and never serialised into prompts — in either edition |
+| **Private AI Chat** | Conversational interface backed by a local bundled model (Max edition) or your choice of OpenAI, Claude, or Gemini (Lite edition) |
+| **Credentials Never Exposed** | Argon2id + Fernet encrypted vault; credentials are injected at execution time and **never sent to any LLM** — in either edition |
 | **Plugin System** | Extend the AI with custom tools — just two files (`tool.yaml` + `handler.py`) dropped into a directory |
-| **MCP Support** | Native Model Context Protocol client — drop any MCP-compliant server into your volume mount and it auto-discovers |
-| **OpenAI-Compatible API** | `/v1/chat/completions` endpoint — drop-in for any n8n workflow, LangChain app, or HTTP client already using ChatGPT |
+| **MCP Support** | Native MCP client over **stdio transport** — drop any Python MCP server into your volume mount and it auto-discovers. HTTP streamable MCP and TypeScript MCP support coming soon. |
+| **Standard AI Compatible API** | `/v1/chat/completions` endpoint — drop-in for any n8n workflow, LangChain app, or HTTP client already using OpenAI-compatible APIs |
 | **Tool Studio** | Browser-based IDE for creating, editing, and live-testing plugins without rebuilding the container |
-| **Container-Native Deployment** | Single Docker container; one volume mount for persistence. Full edition runs fully offline; Light edition requires only outbound LLM API access |
+| **Container-Native Deployment** | Single Docker container; one volume mount for persistence. Max edition runs fully offline; Lite edition requires only outbound LLM API access |
 
 > For full product documentation, architecture details, and deployment guides, visit **[appteleporter.ai](https://appteleporter.ai)**.
 
@@ -64,6 +65,160 @@ From your browser at `/tool-studio` you can:
 - **Test MCP servers** — trigger dependency installation and validate tool discovery without leaving the browser
 
 **Why this matters:** The edit-run loop for a new automation tool drops from *"edit file → rebuild container → test"* to *"edit in browser → click Run."* For teams iterating against live infrastructure, this eliminates most of the friction.
+
+---
+
+## How to Install AppTelePorter
+
+Getting AppTelePorter running is as simple as a single `docker run` command — no configuration files, no build steps, no dependencies to install on your host machine. The entire application — backend, frontend, AI runtime, vault, and Tool Studio — starts up in one container.
+
+The examples below use the **Lite edition**. For the Max edition, replace `appteleporter_lite` with `appteleporter_max` in the image name.
+
+| Edition | Docker Hub |
+|---|---|
+| Lite | [networkevolution/appteleporter_lite](https://hub.docker.com/r/networkevolution/appteleporter_lite/tags) |
+| Max | [networkevolution/appteleporter_max](https://hub.docker.com/r/networkevolution/appteleporter_max/tags) |
+
+---
+
+### Step 1 — Pull the image
+
+```bash
+docker pull networkevolution/appteleporter_lite:latest
+```
+
+---
+
+### Step 2 — Create a local data directory
+
+Before starting the container, create a directory on your host machine. This is where AppTelePorter stores all its persistent data — plugins, MCP servers, the encrypted vault, chat history, and configuration.
+
+```bash
+# Linux / macOS
+mkdir -p ~/appteleporter-data
+
+# Windows (Command Prompt)
+mkdir %USERPROFILE%\appteleporter-data
+
+# Windows (PowerShell)
+New-Item -ItemType Directory -Path "$env:USERPROFILE\appteleporter-data"
+```
+
+**Why this approach?** Mounting a local directory as the data volume means:
+- Your data persists across container restarts and upgrades — just pull the new image and run with the same volume path
+- You can browse, edit, or back up your plugins and MCP server files directly from your host file manager or any editor
+- Upgrading AppTelePorter never touches your plugins, vault, or configuration
+
+The Lite edition requires an external volume mount. The directory will be auto-populated with the correct folder structure on first run.
+
+---
+
+### Step 3 — Start the container
+
+**Ports:**
+- `3000` — AppTelePorter web UI (required)
+- `1514/tcp` and `1514/udp` — Syslog receiver for Device Beacon (optional — only needed if you want AppTelePorter to passively receive syslog data from your network devices)
+
+> **Device Beacon** is a built-in add-on that listens on port 1514 for syslog messages (RFC 3164/5424), extracts device identity and status, and maintains a live device inventory in the UI. If you do not need this feature, use the command without port 1514 — it can also be disabled at any time from **AppTelePorter UI → Settings → Add-On Settings → Device Beacon**.
+
+---
+
+#### Linux
+
+**Without syslog receiver:**
+
+```bash
+docker run -d --name appteleporter \
+  -v ~/appteleporter-data:/app/backend/appteleporter-data \
+  -p 3000:3000 \
+  --restart unless-stopped \
+  networkevolution/appteleporter_lite:latest
+```
+
+**With syslog receiver (Device Beacon):**
+
+```bash
+docker run -d --name appteleporter \
+  -v ~/appteleporter-data:/app/backend/appteleporter-data \
+  -p 3000:3000 \
+  -p 1514:1514/tcp \
+  -p 1514:1514/udp \
+  --restart unless-stopped \
+  networkevolution/appteleporter_lite:latest
+```
+
+---
+
+#### macOS (Docker Desktop)
+
+```bash
+docker run -d --name appteleporter \
+  -v ~/appteleporter-data:/app/backend/appteleporter-data \
+  -p 3000:3000 \
+  networkevolution/appteleporter_lite:latest
+```
+
+With syslog receiver:
+
+```bash
+docker run -d --name appteleporter \
+  -v ~/appteleporter-data:/app/backend/appteleporter-data \
+  -p 3000:3000 \
+  -p 1514:1514/tcp \
+  -p 1514:1514/udp \
+  networkevolution/appteleporter_lite:latest
+```
+
+> On macOS, Docker Desktop handles port binding automatically. The `~/appteleporter-data` path maps to your home directory on the Mac.
+
+---
+
+#### Windows (Docker Desktop)
+
+**Command Prompt:**
+
+```cmd
+docker run -d --name appteleporter ^
+  -v %USERPROFILE%\appteleporter-data:/app/backend/appteleporter-data ^
+  -p 3000:3000 ^
+  networkevolution/appteleporter_lite:latest
+```
+
+**PowerShell:**
+
+```powershell
+docker run -d --name appteleporter `
+  -v "$env:USERPROFILE\appteleporter-data:/app/backend/appteleporter-data" `
+  -p 3000:3000 `
+  networkevolution/appteleporter_lite:latest
+```
+
+With syslog receiver (PowerShell):
+
+```powershell
+docker run -d --name appteleporter `
+  -v "$env:USERPROFILE\appteleporter-data:/app/backend/appteleporter-data" `
+  -p 3000:3000 `
+  -p 1514:1514/tcp `
+  -p 1514:1514/udp `
+  networkevolution/appteleporter_lite:latest
+```
+
+> On Windows, Docker Desktop must be running before executing these commands. You can use either WSL 2 or Hyper-V as the backend.
+
+---
+
+### Step 4 — Open the UI
+
+Once the container starts, open your browser and navigate to:
+
+```
+http://localhost:3000
+```
+
+On first launch you will be prompted to create your vault master password and the first admin user. After that, the full AppTelePorter interface is ready to use.
+
+> **SSL / HTTPS:** The standard container serves on HTTP. Custom SSL-enabled builds tailored to specific organisational requirements are available from Network Evolution — contact [appteleporter.ai](https://appteleporter.ai) for details.
 
 ---
 
@@ -129,6 +284,8 @@ These tools use simulated data — ideal for learning the plugin structure, test
 MCP (Model Context Protocol) servers allow richer integrations — long-running processes, protocol-native clients, and multi-tool servers. AppTelePorter auto-discovers and launches them; their tools appear in the same chat interface as native plugins.
 
 MCP tool names are prefixed with the server name: `{server-name}__{tool-name}`.
+
+> **Current transport support:** AppTelePorter's MCP client currently supports **stdio transport** (Python-based MCP servers launched as subprocesses). Support for **HTTP streamable MCP servers** and **TypeScript MCP servers** is actively in development and will be available in a future release.
 
 ### Example & Demo Servers
 
@@ -300,8 +457,9 @@ See [`docs/tools-ecosystem/TOOL_SPEC.md`](./docs/tools-ecosystem/TOOL_SPEC.md) f
 Use an MCP server instead of a plain plugin when you need:
 - Persistent state or long-lived connections between calls (SSH pools, streaming APIs)
 - Multiple related tools that share initialisation cost
-- A language other than Python
 - Integration with an existing MCP-compliant server from the community
+
+> **Transport note:** The current MCP client supports **stdio transport** (Python servers launched as subprocesses). HTTP streamable MCP and TypeScript MCP server support is coming in a future release.
 
 ### Quickstart with FastMCP
 
