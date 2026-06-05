@@ -43,7 +43,7 @@ It ships in two editions:
 | **Credentials Never Exposed** | Argon2id + Fernet encrypted vault; credentials are injected at execution time and **never sent to any LLM** — in either edition |
 | **Plugin System** | Extend the AI with custom tools — just two files (`tool.yaml` + `handler.py`) dropped into a directory |
 | **MCP Support** | Native MCP client over **stdio transport** — drop any Python MCP server into your volume mount and it auto-discovers. HTTP streamable MCP and TypeScript MCP support coming soon. |
-| **Standard AI Compatible API** | `/v1/chat/completions` endpoint — drop-in for any n8n workflow, LangChain app, or HTTP client already using OpenAI-compatible APIs |
+| **Standard AI Model Compatible API** | Standard `/v1/chat/completions` API — compatible with any n8n workflow, LangChain app, or HTTP client that supports standard AI model APIs |
 | **Tool Studio** | Browser-based IDE for creating, editing, and live-testing plugins without rebuilding the container |
 | **Container-Native Deployment** | Single Docker container; one volume mount for persistence. Max edition runs fully offline; Lite edition requires only outbound LLM API access |
 
@@ -151,6 +151,8 @@ docker run -d --name appteleporter \
 
 #### macOS (Docker Desktop)
 
+**Option A — Terminal:**
+
 ```bash
 docker run -d --name appteleporter \
   -v ~/appteleporter-data:/app/backend/appteleporter-data \
@@ -158,7 +160,7 @@ docker run -d --name appteleporter \
   networkevolution/appteleporter_lite:latest
 ```
 
-With syslog receiver:
+With syslog receiver (Device Beacon):
 
 ```bash
 docker run -d --name appteleporter \
@@ -169,14 +171,31 @@ docker run -d --name appteleporter \
   networkevolution/appteleporter_lite:latest
 ```
 
-> On macOS, Docker Desktop handles port binding automatically. The `~/appteleporter-data` path maps to your home directory on the Mac.
+**Option B — Docker Desktop UI:**
+
+1. Open the **Docker Desktop** application on your Mac.
+2. Click the **Search** bar at the top and type:
+   ```
+   networkevolution/appteleporter_lite
+   ```
+3. Select the image from the results and click **Pull** to download it.
+4. Once the pull completes, find the image under **Images** in the left sidebar and click **Run**.
+5. Expand **Optional settings** and fill in the following:
+   - **Container name:** `appteleporter`
+   - **Ports — Host port `3000` → Container port `3000`** *(required — this is the web UI)*
+   - **Ports — Host port `1514` → Container port `1514`** *(optional — TCP and UDP, only if using Device Beacon syslog receiver)*
+   - **Volumes — Host path:** select the directory you created in Step 2 (e.g. `/Users/yourname/appteleporter-data`)
+   - **Volumes — Container path:** `/app/backend/appteleporter-data`
+     > ⚠️ **Do not change the container path.** This is the internal path AppTelePorter expects and must be entered exactly as shown.
+6. Click **Run**. The container will start and appear under **Containers**.
 
 ---
 
 #### Windows (Docker Desktop)
 
-**Command Prompt:**
+**Option A — Command line:**
 
+*Command Prompt:*
 ```cmd
 docker run -d --name appteleporter ^
   -v %USERPROFILE%\appteleporter-data:/app/backend/appteleporter-data ^
@@ -184,8 +203,7 @@ docker run -d --name appteleporter ^
   networkevolution/appteleporter_lite:latest
 ```
 
-**PowerShell:**
-
+*PowerShell:*
 ```powershell
 docker run -d --name appteleporter `
   -v "$env:USERPROFILE\appteleporter-data:/app/backend/appteleporter-data" `
@@ -194,7 +212,6 @@ docker run -d --name appteleporter `
 ```
 
 With syslog receiver (PowerShell):
-
 ```powershell
 docker run -d --name appteleporter `
   -v "$env:USERPROFILE\appteleporter-data:/app/backend/appteleporter-data" `
@@ -204,7 +221,25 @@ docker run -d --name appteleporter `
   networkevolution/appteleporter_lite:latest
 ```
 
-> On Windows, Docker Desktop must be running before executing these commands. You can use either WSL 2 or Hyper-V as the backend.
+**Option B — Docker Desktop UI:**
+
+1. Open the **Docker Desktop** application on Windows.
+2. Click the **Search** bar at the top and type:
+   ```
+   networkevolution/appteleporter_lite
+   ```
+3. Select the image from the results and click **Pull** to download it.
+4. Once the pull completes, find the image under **Images** in the left sidebar and click **Run**.
+5. Expand **Optional settings** and fill in the following:
+   - **Container name:** `appteleporter`
+   - **Ports — Host port `3000` → Container port `3000`** *(required — this is the web UI)*
+   - **Ports — Host port `1514` → Container port `1514`** *(optional — TCP and UDP, only if using Device Beacon syslog receiver)*
+   - **Volumes — Host path:** select the directory you created in Step 2 (e.g. `C:\Users\yourname\appteleporter-data`)
+   - **Volumes — Container path:** `/app/backend/appteleporter-data`
+     > ⚠️ **Do not change the container path.** This is the internal path AppTelePorter expects and must be entered exactly as shown.
+6. Click **Run**. The container will start and appear under **Containers**.
+
+> Docker Desktop must be running before using either option. WSL 2 backend is recommended for best performance on Windows.
 
 ---
 
