@@ -16,28 +16,35 @@
 
 ## What is AppTelePorter?
 
-AppTelePorter is a **self-hosted, container-native AI platform** that gives network and DevOps teams a private conversational AI agent capable of executing real infrastructure operations — without sending a single credential to the cloud.
+AppTelePorter is a **container-native AI platform** that gives network and DevOps teams a conversational AI agent capable of executing real infrastructure operations — with every credential encrypted in a vault that never leaves your server.
 
-Think of it as a **private ChatGPT that can actually SSH into your switches, query your APIs, and run your automation scripts** — entirely inside your own infrastructure, with every credential encrypted in a vault that never leaves your server.
+Think of it as **your own ChatGPT that can actually SSH into your switches, query your APIs, and run your automation scripts** — with credentials never exposed to any LLM, local or cloud.
+
+It ships in two editions:
+
+- **Full edition** — includes a bundled local model. Inference stays entirely inside your infrastructure. No prompt, no tool output, no data ever leaves your network. Runs fully offline. For best performance, a GPU-enabled host is recommended, as the Full edition packages the AI model directly inside the container.
+- **Light edition** — bring your own LLM (OpenAI, Claude, or Gemini). The platform and **all credentials remain on your server**; conversation context — including tool results like device configs — is sent to your chosen cloud LLM provider for inference only. Choose this when you want frontier-model quality without hosting your own GPU.
+
+> **Important:** In both editions, your device credentials, passwords, and API keys are stored in an encrypted vault and are **never serialised into prompts or sent to any LLM**. Credentials are resolved locally at execution time — the handler function receives the actual value; the LLM (local or cloud) never sees it. Only the tool's *output* (e.g., a VLAN list) becomes part of the conversation.
 
 **How it works in practice:**
 
 1. You ask a question in plain English: *"What VLANs are configured on switch1?"*
 2. AppTelePorter figures out which tool to run and presents an **approval card**.
-3. You approve — credentials are resolved from the vault, the tool executes, and the answer streams back.
-4. No data left your network.
+3. You approve — credentials are resolved from the vault at execution time (never serialised into prompts), the tool executes, and the answer streams back.
+4. **Full edition:** No data left your network. **Light edition:** Tool execution stayed local; only the conversation context passed through your chosen LLM provider for synthesis.
 
 **Key capabilities:**
 
 | Feature | Description |
 |---|---|
-| **Private AI Chat** | Conversational interface backed by a local model (Full edition) or your choice of OpenAI, Claude, or Gemini (Light edition) |
+| **Private AI Chat** | Conversational interface backed by a local bundled model (Full edition) or your choice of OpenAI, Claude, or Gemini (Light edition) |
+| **Credentials Never Exposed** | Argon2id + Fernet encrypted vault; credentials are injected at execution time and never serialised into prompts — in either edition |
 | **Plugin System** | Extend the AI with custom tools — just two files (`tool.yaml` + `handler.py`) dropped into a directory |
 | **MCP Support** | Native Model Context Protocol client — drop any MCP-compliant server into your volume mount and it auto-discovers |
-| **Encrypted Vault** | Argon2id + Fernet encrypted credential store; secrets are injected at execution time, never serialised into prompts |
 | **OpenAI-Compatible API** | `/v1/chat/completions` endpoint — drop-in for any n8n workflow, LangChain app, or HTTP client already using ChatGPT |
 | **Tool Studio** | Browser-based IDE for creating, editing, and live-testing plugins without rebuilding the container |
-| **Fully Self-Hosted** | Single Docker container; one volume mount for persistence; runs offline on a laptop, NOC server, or edge device |
+| **Container-Native Deployment** | Single Docker container; one volume mount for persistence. Full edition runs fully offline; Light edition requires only outbound LLM API access |
 
 > For full product documentation, architecture details, and deployment guides, visit **[appteleporter.ai](https://appteleporter.ai)**.
 
