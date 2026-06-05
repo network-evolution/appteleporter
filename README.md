@@ -243,7 +243,7 @@ docker run -d --name appteleporter `
 
 ---
 
-### Step 4 — Open the UI
+### Step 4 — Open the UI and complete first-time setup
 
 Once the container starts, open your browser and navigate to:
 
@@ -251,9 +251,50 @@ Once the container starts, open your browser and navigate to:
 http://localhost:3000
 ```
 
-On first launch you will be prompted to create your vault master password and the first admin user. After that, the full AppTelePorter interface is ready to use.
-
 > **SSL / HTTPS:** The standard container serves on HTTP. Custom SSL-enabled builds tailored to specific organisational requirements are available from Network Evolution — contact [appteleporter.ai](https://appteleporter.ai) for details.
+
+---
+
+#### 4a — Set the vault master password
+
+The very first screen asks you to create the **vault master password**. This password encrypts everything AppTelePorter stores, including:
+
+- All device and API credentials (SSH usernames, passwords, API keys, host addresses)
+- User accounts and access tokens
+- LLM provider API keys and model settings
+- Application session signing secrets
+
+> **⚠️ This password cannot be recovered — ever. Store it somewhere safe.**
+>
+> AppTelePorter never stores your master password on disk, in a database, or anywhere else. Internally, the vault works like this: your password is run through Argon2id (a memory-hard key derivation function) to produce a 256-bit encryption key. That key is used to encrypt the entire vault as a single AES-encrypted blob — and then the key is discarded. Only a bcrypt hash of the password is kept inside the vault itself, solely for verifying the password at unlock time.
+>
+> **The consequence:** there is no password reset, no recovery email, and no backdoor. If you lose the master password, the encrypted vault blob cannot be decrypted — all stored credentials, API keys, and user accounts will need to be recreated from scratch. Write it down and keep it safe.
+
+---
+
+#### 4b — Create the first admin user
+
+After setting the vault password, you will be prompted to create the **first admin user** — the account you will use to log in to the AppTelePorter interface. Set a username and a strong password. Additional users can be added later from **Settings → Users**.
+
+---
+
+#### 4c — Configure your LLM provider (Lite edition only)
+
+If you are running the **Lite edition**, the AI cannot process any requests until you connect it to an LLM provider. Go to:
+
+**Settings → LLM Settings**
+
+Select the model provider you want to use:
+
+- **OpenAI (ChatGPT)** — enter your OpenAI API key
+- **Google Gemini** — enter your Google AI Studio API key
+- **Anthropic Claude** — enter your Anthropic API key
+
+After entering the API key, click **Test Connection** to verify it is working. Once confirmed, AppTelePorter is ready to use.
+
+> If you need support for a specific model or provider not listed, reach out to **info@networkevolution.in** — we will treat it as a feature enhancement request.
+
+The Max edition has a bundled local model and does not require this step.
 
 ---
 
