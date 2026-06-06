@@ -476,14 +476,6 @@ If a plugin requires packages (e.g., `netmiko`, `paramiko`, `requests`):
 - **Via Tool Studio:** Open the plugin directory, click **"Install Deps"** — packages are installed instantly, no container rebuild needed.
 - **Via requirements.txt:** Add a `requirements.txt` file to the plugin directory. AppTelePorter installs it automatically on container startup.
 
-### Verify the tool loaded
-
-```bash
-curl http://localhost:3000/api/tools \
-  -H "Authorization: Bearer <your-api-key>" \
-  | python3 -m json.tool
-```
-
 ---
 
 ## How to Create Your Own Plugin
